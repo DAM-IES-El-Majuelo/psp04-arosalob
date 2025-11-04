@@ -1,0 +1,31 @@
+UpdateLong not allowed in ResultSet
+
+According to the Derby Documentation, a query with an ORDER BY is not updatable:
+Only simple, single-table SELECT cursors can be updatable. The SELECT statement for updatable ResultSets has the same syntax as the SELECT statement for updatable cursors. To generate updatable cursors:
+
+        The SELECT statement must not include an ORDER BY clause.
+        The underlying Query must be a SelectExpression.
+        The SelectExpression in the underlying Query must not include:
+            DISTINCT
+            Aggregates
+            GROUP BY clause
+            HAVING clause
+            ORDER BY clause
+        The FROM clause in the underlying Query must not have:
+            more than one table in its FROM clause
+            anything other than one table name
+            SelectExpressions
+            subqueries
+        If the underlying Query has a WHERE clause, the WHERE clause must not have subqueries.
+
+In other words you can't include the ORDER BY, but that would defeat your purpose (as you seem to be renumbering some identifier).
+You either need to use some query to renumber without processing in JDBC, or you need to use two Statement objects, one to query the rows and another to update them.
+Derby also does not support TYPE_SCROLL_SENSITIVE result sets. According to the documentation, Derby supports both:
+    TYPE_FORWARD_ONLY and
+    TYPE_SCROLL_INSENSITIVE
+Note that your current code doesn't require TYPE_SCROLL_INSENSITIVE because you are only processing it as a forward only.
+
+Enlace DERBY:
+http://db.apache.org/derby/docs/10.10/devguide/cdevconcepts22641.html
+
+
